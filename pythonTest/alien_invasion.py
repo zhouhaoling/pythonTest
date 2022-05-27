@@ -95,6 +95,7 @@ class AlienInvasion:
         button_clicked = self.play_button.rect.collidepoint(mouse_pos)
         if button_clicked and not self.stats.game_active:
             #重置游戏信息
+            self.settings.initialize_dynamic_settings()
             self.stats.reset_stats()
             self.stats.game_active = True
             #清空游戏屏幕
@@ -122,6 +123,7 @@ class AlienInvasion:
         if not self.aliens:
             self.bullets.empty()
             self._create_fleet()
+            self.settings.increase_speed()
         
     def _update_aliens(self):
         #更新外星人位置
@@ -185,8 +187,9 @@ class AlienInvasion:
     
     def _ship_hit(self):
         """响应飞船被外星人撞到"""
-        self._show_false()
+        # self._show_false()
         if self.stats.ships_left > 0:
+            self._show_false()
             self.stats.ships_left -= 1
             #清空余下的外星人和子弹
             self.aliens.empty()
@@ -194,7 +197,7 @@ class AlienInvasion:
             #创建一群新的外星人，并将飞船放置底部
             self._create_fleet()
             self.ship.center_ship()
-            sleep(1)
+            sleep(0.5)
         else:
             self.stats.game_active = False
             pygame.mouse.set_visible(True)
@@ -202,8 +205,8 @@ class AlienInvasion:
     def _show_false(self):
         font_name = pygame.font.match_font('fangsong')
         font = pygame.font.Font(font_name, 100)
-        font_surface = font.render('闯关失败,重新开始', True, (255,0,0))
-        self.screen.blit(font_surface, (500,500))
+        font_surface = font.render('闯关失败,加油！！', True, (255,0,0), (255,255,255))
+        self.screen.blit(font_surface, (600,400))
         pygame.display.flip()
         sleep(1)
 
