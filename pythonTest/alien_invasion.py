@@ -4,6 +4,7 @@ import sys
 from time import sleep
 import pygame
 
+from button import Button
 from alien import Alien
 from settings import Settiongs
 from ship import Ship
@@ -32,6 +33,8 @@ class AlienInvasion:
         self.aliens = pygame.sprite.Group()
 
         self._create_fleet()
+        self.play_button = Button(self, "Play")
+
 
     def _create_fleet(self):
         """创建外星人"""
@@ -83,6 +86,24 @@ class AlienInvasion:
                     self._check_keydown_events(event)
                 elif event.type == pygame.KEYUP:
                     self._check_keyup_events(event)
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = pygame.mouse.get_pos()
+                    self._check_play_button(mouse_pos)
+    
+    def _check_play_button(self, mouse_pos):
+        """在玩家单击play按钮的时候开始新游戏"""
+        button_clicked = self.play_button.rect.collidepoint(mouse_pos)
+        if button_clicked and not self.stats.game_active:
+            #重置游戏信息
+            self.stats.reset_stats()
+            self.stats.game_active = True
+            #清空游戏屏幕
+            self.aliens.empty()
+            self.bullets.empty()
+            #重新创建
+            self._create_fleet()
+            self.ship.center_ship()
+            pygame.mouse.set_visible(False)
 
     def _update_bullets(self):
         """更新子弹位置"""
@@ -147,6 +168,8 @@ class AlienInvasion:
             for bullet in self.bullets.sprites():
                 bullet.draw_bullet()
             self.aliens.draw(self.screen)
+            if not self.stats.game_active:
+                self.play_button.draw_button()
             pygame.display.update()    
 
     def _check_fleet_edges(self):
@@ -174,6 +197,7 @@ class AlienInvasion:
             sleep(1)
         else:
             self.stats.game_active = False
+            pygame.mouse.set_visible(True)
 
     def _show_false(self):
         font_name = pygame.font.match_font('fangsong')
