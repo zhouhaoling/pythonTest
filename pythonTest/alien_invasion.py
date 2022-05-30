@@ -79,6 +79,8 @@ class AlienInvasion:
     def _check_events(self):
         for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    #记录最高分,在退出之前
+                    self.stats.save_high_score()
                     sys.exit()
                 # elif event.type == pygame.VIDEORESIZE:
                 #     SCREEN_SIZE = event.size
@@ -156,6 +158,7 @@ class AlienInvasion:
         elif event.key == pygame.K_LEFT:
             self.ship.moving_left = True
         elif event.key == pygame.K_q:
+            self.stats.save_high_score()
             sys.exit()
         elif event.key == pygame.K_SPACE:
             self._fire_bullet()
