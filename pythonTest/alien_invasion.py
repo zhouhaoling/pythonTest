@@ -10,6 +10,7 @@ from settings import Settiongs
 from ship import Ship
 from bullet import Bullet
 from game_stats import GameStats
+from scoreboard import Scoreboard
 
 SCREEN_SIZE = (1200,800)
 
@@ -29,8 +30,10 @@ class AlienInvasion:
         pygame.display.set_caption("Alien Invasion")
         self.stats = GameStats(self)
         self.ship = Ship(self)
+        self.scb = Scoreboard(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
+        
 
         self._create_fleet()
         self.play_button = Button(self, "Play")
@@ -98,6 +101,7 @@ class AlienInvasion:
             self.settings.initialize_dynamic_settings()
             self.stats.reset_stats()
             self.stats.game_active = True
+            self.scb.prep_score()
             #清空游戏屏幕
             self.aliens.empty()
             self.bullets.empty()
@@ -120,6 +124,10 @@ class AlienInvasion:
     def _check_bullet_alien_colisions(self):
         #删除发生碰撞的子弹和外星人
         collisions = pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
+        if collisions:
+            for aliens in collisions.values():
+                self.stats.score += self.settings.alien_points * len(aliens)
+            self.scb.prep_score() 
         if not self.aliens:
             self.bullets.empty()
             self._create_fleet()
@@ -170,6 +178,7 @@ class AlienInvasion:
             for bullet in self.bullets.sprites():
                 bullet.draw_bullet()
             self.aliens.draw(self.screen)
+            self.scb.show_score()
             if not self.stats.game_active:
                 self.play_button.draw_button()
             pygame.display.update()    
