@@ -1,5 +1,3 @@
-from cmath import inf
-import imp
 import sys
 from time import sleep
 import pygame
@@ -66,24 +64,26 @@ class AlienInvasion:
 
     def run_game(self):
         #设置背景图片
-        background = pygame.image.load(r'pythonTest\universe.jpg').convert()
+        self.screen.fill(self.settings.bg_color)
+        # background = pygame.image.load(r'pythonTest\universe.jpg').convert()
         while True:
             self._check_events()
             if self.stats.game_active:
                 self.ship.update()
                 self._update_bullets()
                 self._update_aliens()
-            self._update_screen(background)
+            self._update_screen()
+            # self._update_screen(background)
 
 
     def _check_events(self):
         for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
-                elif event.type == pygame.VIDEORESIZE:
-                    SCREEN_SIZE = event.size
-                    self.screen = pygame.display.set_mode(SCREEN_SIZE,pygame.RESIZABLE)
-                    pygame.display.update()
+                # elif event.type == pygame.VIDEORESIZE:
+                #     SCREEN_SIZE = event.size
+                #     self.screen = pygame.display.set_mode(SCREEN_SIZE,pygame.RESIZABLE)
+                #     pygame.display.update()
                 #左右移动 
                 elif event.type == pygame.KEYDOWN:
                     self._check_keydown_events(event)
@@ -102,6 +102,8 @@ class AlienInvasion:
             self.stats.reset_stats()
             self.stats.game_active = True
             self.scb.prep_score()
+            self.scb.prep_level()
+            self.scb.prep_ships()
             #清空游戏屏幕
             self.aliens.empty()
             self.bullets.empty()
@@ -127,11 +129,16 @@ class AlienInvasion:
         if collisions:
             for aliens in collisions.values():
                 self.stats.score += self.settings.alien_points * len(aliens)
-            self.scb.prep_score() 
+            self.scb.prep_score()
+            self.scb.check_high_score() 
         if not self.aliens:
+            #清空屏幕并重新创建
             self.bullets.empty()
             self._create_fleet()
             self.settings.increase_speed()
+            #提高等级
+            self.stats.level += 1
+            self.scb.prep_level()
         
     def _update_aliens(self):
         #更新外星人位置
@@ -170,10 +177,11 @@ class AlienInvasion:
     
     
 
-    def _update_screen(self,background):
-            # self.screen.fill(self.settings.bg_color)
+               #           , background
+    def _update_screen(self):
+            self.screen.fill(self.settings.bg_color)
             # 在屏幕上绘制飞船
-            self.screen.blit(background,(0,0))
+            # self.screen.blit(background,(0,0))
             self.ship.blitme()
             for bullet in self.bullets.sprites():
                 bullet.draw_bullet()
@@ -199,7 +207,9 @@ class AlienInvasion:
         # self._show_false()
         if self.stats.ships_left > 0:
             self._show_false()
+            # 将ships_left减一并更新记分牌
             self.stats.ships_left -= 1
+            self.scb.prep_ships()
             #清空余下的外星人和子弹
             self.aliens.empty()
             self.bullets.empty()
@@ -214,7 +224,7 @@ class AlienInvasion:
     def _show_false(self):
         font_name = pygame.font.match_font('fangsong')
         font = pygame.font.Font(font_name, 100)
-        font_surface = font.render('闯关失败,加油！！', True, (255,0,0), (255,255,255))
+        font_surface = font.render('闯关失败', True, (255,0,0), (255,255,255))
         self.screen.blit(font_surface, (600,400))
         pygame.display.flip()
         sleep(1)

@@ -27,7 +27,7 @@ class Settiongs:
         # 飞船、子弹、外星人速度设置
         self.ship_speed = 1.5
         self.bullet_speed = 3.0
-        self.alien_speed = 0.5
+        self.alien_speed = 1.0
 
         self.fleet_direction = 1
         #记分

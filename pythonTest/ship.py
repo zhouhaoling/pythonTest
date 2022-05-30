@@ -1,13 +1,18 @@
+import imp
 import pygame
+from pygame.sprite import Sprite
 
 """飞船管理类"""
-class Ship:
+class Ship(Sprite):
+
     def __init__(self,ai_game):
         """初始化飞船及其位置"""
+        super().__init__()
         self.setShip(ai_game)
-        self.image = pygame.image.load('pythonTest\picture\ship.bmp')
-        # 将飞船图片缩小
-        self.image = pygame.transform.scale(self.image,(40,60))
+        # self.image = pygame.image.load('pythonTest\picture\ship.bmp')
+        # # 将飞船图片缩小,当图片过大时
+        # self.image = pygame.transform.scale(self.image,(40,60))
+        self.image = pygame.image.load(r'pythonTest\ship.bmp')
         self.rect = self.image.get_rect()
         self.rect.midbottom = self.screen_rect.midbottom
         #在飞船属性x中存储小数值
