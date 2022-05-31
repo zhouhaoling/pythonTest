@@ -1,6 +1,7 @@
 import sys
 from time import sleep
 import pygame
+from random import randint
 
 from button import Button
 from alien import Alien
@@ -9,6 +10,7 @@ from ship import Ship
 from bullet import Bullet
 from game_stats import GameStats
 from scoreboard import Scoreboard
+from star import Star
 
 SCREEN_SIZE = (1200,800)
 
@@ -34,6 +36,8 @@ class AlienInvasion:
         
 
         self._create_fleet()
+        self.stars = pygame.sprite.Group()
+        self.create_stars(self.settings.screen_width, self.settings.screen_height, self.settings.max_x_space, self.settings.max_y_space)
         self.play_button = Button(self, "Play")
 
 
@@ -185,6 +189,8 @@ class AlienInvasion:
             self.screen.fill(self.settings.bg_color)
             # 在屏幕上绘制飞船
             # self.screen.blit(background,(0,0))
+            #绘制星星背景
+            self.stars.draw(self.screen)
             self.ship.blitme()
             for bullet in self.bullets.sprites():
                 bullet.draw_bullet()
@@ -240,6 +246,43 @@ class AlienInvasion:
                 #闯关失败
                 self._ship_hit()
                 break
+
+    def create_star(self, star_right_coordinate, random_x_space,
+                    star_bottom_coordinate, random_y_space):
+        # 创建一个星星
+        star = Star(self)
+        # 新增星星左坐标为前一个星星右坐标加随机横间距
+        star.rect.x = star_right_coordinate + random_x_space
+        # 每行星星上方留出适当空间
+        star.rect.y = star_bottom_coordinate + random_y_space
+        # 将星星增添到星星群
+        self.stars.add(star)
+    
+    def create_stars(self, screen_width, screen_height, max_x_space,
+                     max_y_space):
+        star = Star(self)
+        # 记录前一个星星右坐标
+        star_right_coordinate = 0
+        # 记录前行星星底坐标
+        star_bottom_coordinate = 0
+        # 增加随机列间距
+        random_x_space = randint(1, max_x_space)
+        # 增加随机行间距
+        random_y_space = randint(1, max_y_space)
+        # 屏幕纵向空间足够时循环创建整行星星
+        while star_bottom_coordinate + star.rect.height + random_y_space < screen_height:
+            # 屏幕横向空间足够时循环创建单个星星
+            while star_right_coordinate + star.rect.width + random_x_space < screen_width:
+                self.create_star(star_right_coordinate, random_x_space,
+                                 star_bottom_coordinate, random_y_space)
+                # 重置前一个星星右坐标和随机横间距
+                star_right_coordinate = star_right_coordinate + star.rect.width + random_x_space
+                random_x_space = randint(1, max_x_space)
+            # 重置前一个星星右坐标、前行星星底坐标和随机纵间距
+            star_right_coordinate = 0
+            star_bottom_coordinate = star_bottom_coordinate + star.rect.height + random_y_space
+            random_y_space = randint(1, max_y_space)
+
 
 
 if __name__ == '__main__':

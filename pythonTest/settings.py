@@ -21,6 +21,10 @@ class Settiongs:
         self.speedup_scale = 1.1
         self.score_scale = 1.5
         self.initialize_dynamic_settings()
+        # 设置星星间距最大值
+        self.max_x_space = 100
+        self.max_y_space = 100
+
     
     def initialize_dynamic_settings(self):
         """初始化随游戏进行而变化的设置"""
