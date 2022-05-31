@@ -14,6 +14,7 @@ class GameStats:
         self.reset_stats()
         #任何情况下都不应重置最高的分
         self.high_score = 0
+        #初始化，读取文件中的最高分
         self.load_high_score()
     
     def reset_stats(self):
@@ -30,6 +31,7 @@ class GameStats:
             file_object.close()
     
     def load_high_score(self):
+        """读取high_score.txt文件中记录的最高分"""
         try:
             with open('pythonTest\high_score.txt') as file_object:
                 h_s = file_object.read()
